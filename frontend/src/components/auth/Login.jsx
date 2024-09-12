@@ -30,13 +30,13 @@ const Login = () => {
                 },
                 withCredentials: true,
             });
-            console.log(res.data.success);
+            // console.log(res.data.success);
             if (res.data.success) {
                 navigate("/");
                 toast.success(res.data.message);
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             toast.error(error.response.data.message);
         } 
   };
