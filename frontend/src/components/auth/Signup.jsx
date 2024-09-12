@@ -8,6 +8,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { toast } from "sonner";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/redux/authSlice";
+import { Loader2 } from "lucide-react";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -19,7 +22,9 @@ const Signup = () => {
     file: "",
   });
 
-  const navigate=useNavigate();
+  const { loading } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const ChangeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -29,35 +34,39 @@ const Signup = () => {
     setInput({ ...input, file: e.target.files?.[0] });
   };
 
-  const submitHandler=async (e)=>{
+  const submitHandler = async (e) => {
     e.preventDefault();
-    const formdata=new FormData();
-    formdata.append("fullname",input.fullname);
-    formdata.append("email",input.email);
-    formdata.append("phoneNumber",input.phoneNumber);
-    formdata.append("role",input.role);
-    formdata.append("password",input.password);
 
-    if(input.file){
-        formdata.append("file",input.file);
+    const formdata = new FormData();
+    formdata.append("fullname", input.fullname);
+    formdata.append("email", input.email);
+    formdata.append("phoneNumber", input.phoneNumber);
+    formdata.append("role", input.role);
+    formdata.append("password", input.password);
+
+    if (input.file) {
+      formdata.append("file", input.file);
     }
     try {
-        const res=await axios.post(`${USER_API_END_POINT}/register`,formdata,{
-            headers:{
-                "Content-Type":"multipart/form-data"
-            },
-            withCredentials:true,
-        });
+      dispatch(setLoading(true));
+      const res = await axios.post(`${USER_API_END_POINT}/register`, formdata, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
-        if(res.data.success){
-            navigate("/login");
-            toast.success(res.data.message);
-        }
+      if (res.data.success) {
+        navigate("/login");
+        toast.success(res.data.message);
+      }
     } catch (error) {
-        // console.log(error);
-        toast.error(error.response.data.message);
+      // console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      dispatch(setLoading(false));
     }
-  }
+  };
   return (
     <div>
       <Navbar />
@@ -69,19 +78,43 @@ const Signup = () => {
           <h1 className="font-bold text-xl mb-5">Sign Up</h1>
           <div className="my-2">
             <Label>Full Name</Label>
-            <Input type="text" value={input.fullname} name="fullname" onChange={ChangeEventHandler} placeholder="Sanjeeb" />
+            <Input
+              type="text"
+              value={input.fullname}
+              name="fullname"
+              onChange={ChangeEventHandler}
+              placeholder="Sanjeeb"
+            />
           </div>
           <div className="my-2">
             <Label>Email</Label>
-            <Input type="email" value={input.email} name="email" onChange={ChangeEventHandler} placeholder="raisanjeeb42@gmail.com" />
+            <Input
+              type="email"
+              value={input.email}
+              name="email"
+              onChange={ChangeEventHandler}
+              placeholder="raisanjeeb42@gmail.com"
+            />
           </div>
           <div className="my-2">
             <Label>Phone Number</Label>
-            <Input type="text"  value={input.phoneNumber} name="phoneNumber" onChange={ChangeEventHandler} placeholder="1234567890" />
+            <Input
+              type="text"
+              value={input.phoneNumber}
+              name="phoneNumber"
+              onChange={ChangeEventHandler}
+              placeholder="1234567890"
+            />
           </div>
           <div className="my-2">
             <Label>Password</Label>
-            <Input type="password" value={input.password} name="password" onChange={ChangeEventHandler} placeholder="Password" />
+            <Input
+              type="password"
+              value={input.password}
+              name="password"
+              onChange={ChangeEventHandler}
+              placeholder="Password"
+            />
           </div>
 
           <div className="flex items-center justify-between mx-0">
@@ -94,7 +127,7 @@ const Signup = () => {
                   type="radio"
                   name="role"
                   value="student"
-                  checked={input.role==='student'}
+                  checked={input.role === "student"}
                   onChange={ChangeEventHandler}
                   className="cursor-pointer"
                 />
@@ -105,7 +138,7 @@ const Signup = () => {
                   type="radio"
                   name="role"
                   value="recruiter"
-                  checked={input.role==='recruiter'}
+                  checked={input.role === "recruiter"}
                   onChange={ChangeEventHandler}
                   className="cursor-pointer"
                 />
@@ -114,12 +147,28 @@ const Signup = () => {
             </RadioGroup>
             <div className="flex items-center gap-2">
               <Label>Profile</Label>
-              <Input accept="image/*" type="file" onChange={ChangeFileHandler} className="cursor-pointer" />
+              <Input
+                accept="image/*"
+                type="file"
+                onChange={ChangeFileHandler}
+                className="cursor-pointer"
+              />
             </div>
           </div>
-          <Button variant="destructive" type="submit" className=" w-full my-5">
-            Signup
-          </Button>
+          {loading ? (
+            <Button className="full my-4">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </Button>
+          ) : (
+            <Button
+              variant="destructive"
+              type="submit"
+              className=" w-full my-5"
+            >
+              Sign Up
+            </Button>
+          )}
           <span className="text-sm">
             Already Have an acount?{" "}
             <Link to="/login" className="text-blue-600">
