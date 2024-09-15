@@ -9,11 +9,10 @@ import AppliedJobTable from "./AppliedJobTable";
 import UpdateProfileDialog from "./UpdateProfileDialog";
 import { useSelector } from "react-redux";
 
-
 const isResume = true;
 const Profile = () => {
-  const [open,setOpen]=useState(false);
-  const {user}=useSelector(store=>store.auth);
+  const [open, setOpen] = useState(false);
+  const { user } = useSelector((store) => store.auth);
   const skills = user?.profile?.skills;
 
   return (
@@ -30,13 +29,11 @@ const Profile = () => {
             </Avatar>
             <div>
               <h1 className="font-medium text-xl">{user?.fullname}</h1>
-              <p className="font-light">
-                {user?.profile?.bio}
-              </p>
+              <p className="font-light">{user?.profile?.bio}</p>
             </div>
           </div>
           <Button className="text-right">
-            <PenIcon onClick={()=>setOpen(!open)}/>
+            <PenIcon onClick={() => setOpen(!open)} />
           </Button>
         </div>
         <div className="my-5">
@@ -52,7 +49,7 @@ const Profile = () => {
         <div>
           <h1>Skills</h1>
           <div className="flex items-center gap-1">
-            {skills.length !== 0 ? (
+            {skills && skills.length !== 0 ? (
               skills.map((item, index) => (
                 <Badge className="border-gray-400" key={index}>
                   {item}
@@ -68,10 +65,10 @@ const Profile = () => {
           {isResume ? (
             <a
               target="blank"
-              href="https://www.linkedin.com/in/sanjeeb-kumar-rai-08a02517b/"
+              href={user?.profile?.resume}
               className="text-blue-500 hover:underline cursor-pointer"
             >
-              Sanjeeb
+            {user?.fullname}_resume.pdf
             </a>
           ) : (
             <span>No resume</span>
@@ -82,7 +79,7 @@ const Profile = () => {
         <h1 className="font-bold text-lg my-5">Applied Jobs</h1>
         {<AppliedJobTable />}
       </div>
-      <UpdateProfileDialog open={open} setOpen={setOpen}/>
+      <UpdateProfileDialog open={open} setOpen={setOpen} />
     </div>
   );
 };
